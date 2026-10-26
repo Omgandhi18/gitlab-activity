@@ -1,0 +1,29 @@
+# Put this file at .github/workflows/sync.yml in your private GitHub repo.
+name: Sync GitLab activity
+
+on:
+  schedule:
+    - cron: "17 18 * * *"   # every day at 23:47 IST
+  workflow_dispatch:          # adds a "Run workflow" button on the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Add commits for new GitLab activity
+        env:
+          GIT_EMAIL: 81526761+Omgandhi18@users.noreply.github.com   # GitHub's private address for your account
+          GITLAB_USER: om67                                         # only used if there is no token
+          TIMEZONE: Asia/Kolkata
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+        run: python3 gitlab_graph_sync.py
+
+      - name: Push
+        run: git push
